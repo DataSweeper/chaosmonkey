@@ -253,7 +253,7 @@ func (s Spinnaker) Apps(c chan<- *D.App, appNames []string) {
 // GetInstanceIDs gets the instance ids for a cluster
 func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvider string, region D.RegionName, cluster D.ClusterName) (D.ASGName, []D.InstanceID, error) {
 	url := s.activeASGURL(app, string(account), string(cluster), cloudProvider, string(region))
-
+	fmt.Println(url)
 	resp, err := s.client.Get(url)
 	if err != nil {
 		return "", nil, errors.Wrapf(err, "http get failed at %s", url)
@@ -270,13 +270,14 @@ func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvid
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
 	if err != nil {
 		return "", nil, errors.Wrap(err, fmt.Sprintf("body read failed at %s", url))
 	}
 
 	var data struct {
 		Name      string
-		Instances []struct{ Name string }
+		Instances []struct{ HumanReadableName string }
 	}
 
 	err = json.Unmarshal(body, &data)
@@ -287,7 +288,7 @@ func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvid
 	asg := D.ASGName(data.Name)
 	instances := make([]D.InstanceID, len(data.Instances))
 	for i, instance := range data.Instances {
-		instances[i] = D.InstanceID(instance.Name)
+		instances[i] = D.InstanceID(instance.HumanReadableName)
 	}
 
 	return asg, instances, nil

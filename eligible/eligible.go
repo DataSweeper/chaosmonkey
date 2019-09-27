@@ -16,12 +16,13 @@
 package eligible
 
 import (
+	"strings"
+
 	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/SmartThingsOSS/frigga-go"
 	"github.com/pkg/errors"
-	"strings"
 )
 
 // TODO: make these a configuration parameter
@@ -104,20 +105,23 @@ func isNeverEligible(cluster deploy.ClusterName) bool {
 }
 
 func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs []chaosmonkey.Exception, dep deploy.Deployment) ([]cluster, error) {
+
 	account := deploy.AccountName(group.Account())
 	clusterNames, err := dep.GetClusterNames(group.App(), account)
+
 	if err != nil {
 		return nil, err
 	}
 
 	result := make([]cluster, 0)
+
 	for _, clusterName := range clusterNames {
 		names, err := frigga.Parse(string(clusterName))
 		if err != nil {
 			return nil, err
 		}
 
-		deployedRegions, err := dep.GetRegionNames(names.App, account, clusterName)
+		deployedRegions, err := dep.GetRegionNames( /*names.App*/ group.App(), account, clusterName)
 		if err != nil {
 			return nil, err
 		}
@@ -132,15 +136,16 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 				continue
 			}
 
-			if grp.Contains(group, string(account), string(region), string(clusterName)) {
-				result = append(result, cluster{
-					appName:       deploy.AppName(names.App),
-					accountName:   account,
-					cloudProvider: cloudProvider,
-					regionName:    region,
-					clusterName:   clusterName,
-				})
-			}
+			//if grp.Contains(group, string(account), string(region), string(clusterName)) {
+			result = append(result, cluster{
+				//				appName:       deploy.AppName(names.App),
+				appName:       deploy.AppName(group.App()),
+				accountName:   account,
+				cloudProvider: cloudProvider,
+				regionName:    region,
+				clusterName:   clusterName,
+			})
+			//}
 		}
 	}
 
