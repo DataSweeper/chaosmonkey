@@ -1,0 +1,19 @@
+[chaosmonkey]
+enabled = true
+schedule_enabled = true
+leashed = false
+accounts = ["k8s-cicd", "aws"]
+
+start_hour = 1                     # time during day when starts terminating
+end_hour = 24                      # time during day when stops terminating
+
+[database]
+host = "192.168.56.101"
+name = "chaosmonkey"
+user = "root"
+encrypted_password = "hello@123"
+
+[spinnaker]
+endpoint = "https://spinnaker-gate.ps.money:8085"
+x509_cert = "C:\\Users\\sivagnanamarumugam\\go1.12-src\\src\\github.com\\netflix\\chaosmonkey\\temp\\client.crt"
+x509_key = "C:\\Users\\sivagnanamarumugam\\go1.12-src\\src\\github.com\\netflix\\chaosmonkey\\temp\\key.out"

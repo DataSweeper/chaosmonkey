@@ -229,7 +229,7 @@ func (e *Entry) Crontab(termPath, account string) string {
 func terminateCommand(termPath string, group grp.InstanceGroup) string {
 	cmd := fmt.Sprintf("%s %s %s", termPath, group.App(), group.Account())
 	if cluster, ok := group.Cluster(); ok {
-		cmd = fmt.Sprintf("%s --cluster=%s", cmd, cluster)
+		cmd = fmt.Sprintf("%s --cluster=\"%s\"", cmd, cluster)
 	}
 
 	if stack, ok := group.Stack(); ok {
